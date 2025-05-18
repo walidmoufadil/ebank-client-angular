@@ -1,0 +1,21 @@
+/* Animation fade-in pour la carte de login */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-fade-in {
+  animation: fade-in 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Style pour le logo si besoin d'un fallback */
+img[alt="Bank Logo"] {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  border-radius: 1rem;
+  padding: 0.5rem;
+}
+
+/* Responsive pour petits écrans */
+@media (max-width: 480px) {
+  .max-w-md { max-width: 95vw; }
+  .p-8 { padding: 1.5rem; }
+}
