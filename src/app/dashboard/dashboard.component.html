@@ -1,0 +1,58 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-3xl font-bold mb-6">Tableau de bord</h1>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Carte statistique - Total des comptes -->
+    <mat-card class="bg-indigo-50">
+      <mat-card-content class="p-4">
+        <div class="text-indigo-600 text-lg font-semibold">Total des comptes</div>
+        <div class="text-3xl font-bold mt-2">{{ totalAccounts }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Carte statistique - Total des soldes -->
+    <mat-card class="bg-emerald-50">
+      <mat-card-content class="p-4">
+        <div class="text-emerald-600 text-lg font-semibold">Total des soldes</div>
+        <div class="text-3xl font-bold mt-2">{{ formatCurrency(totalBalance) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Autres statistiques peuvent être ajoutées ici -->
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Graphique en donut des types de comptes -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Distribution des types de comptes</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <canvas baseChart
+          [type]="'doughnut'"
+          [data]="accountTypeChartData"
+          [options]="accountTypeChartOptions">
+        </canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Graphique en barres des soldes des comptes -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Soldes des comptes</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <canvas baseChart
+          [type]="'bar'"
+          [data]="balanceChartData"
+          [options]="balanceChartOptions">
+        </canvas>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

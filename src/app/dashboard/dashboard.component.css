@@ -1,0 +1,15 @@
+.dashboard-card {
+  @apply rounded-lg shadow-md p-4;
+}
+
+.chart-container {
+  @apply relative min-h-[300px] w-full;
+}
+
+mat-card {
+  @apply mb-4;
+}
+
+mat-card-header {
+  @apply pb-4;
+}
