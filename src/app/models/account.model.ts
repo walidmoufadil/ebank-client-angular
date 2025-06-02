@@ -23,3 +23,11 @@ export interface SavingAccount extends BaseAccount {
 }
 
 export type BankAccount = CurrentAccount | SavingAccount;
+
+export interface AccountRequest {
+    initialBalance: number;
+    customerId: number;
+    type: 'current' | 'saving';
+    overDraft?: number;
+    interestRate?: number;
+}

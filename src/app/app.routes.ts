@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { CustomersComponent } from './customers/customers.component';
 import { AccountsComponent } from './accounts/accounts.component';
+import { AccountOperationsComponent } from './accounts/account-operations.component';
 import { CustomerFormComponent } from './customers/customer-form.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'customers', component: CustomersComponent },
   { path: 'customers/new', component: CustomerFormComponent },
-  { path: 'accounts', component: AccountsComponent }
+  { path: 'accounts', component: AccountsComponent },
+  { path: 'accounts/:id/operations', component: AccountOperationsComponent }
 ];

@@ -1,0 +1,22 @@
+/* styles pour la navbar et le menu utilisateur */
+.user-menu-container {
+  cursor: pointer;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+/* Transition pour le menu déroulant */
+a {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .user-menu-container {
+    margin-left: 0;
+  }
+}

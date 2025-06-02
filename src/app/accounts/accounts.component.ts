@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AccountService } from '../services/account.service';
+import { CustomerService } from '../services/customer.service';
 import { TransactionService } from '../services/transaction.service';
-import { BaseAccount, CurrentAccount, SavingAccount } from '../models/account.model';
+import { BaseAccount, CurrentAccount, SavingAccount, AccountRequest } from '../models/account.model';
 import { TransactionDialogComponent } from '../components/transaction-dialog.component';
+import { AccountDialogComponent } from '../components/account-dialog.component';
 import { NotificationService } from '../services/notification.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Customer } from '../models/customer.model';
 
 @Component({
   selector: 'app-accounts',
@@ -19,6 +22,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
+    RouterLink,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -32,9 +37,11 @@ export class AccountsComponent implements OnInit {
   accounts: BaseAccount[] = [];
   loading: boolean = true;
   error: string | null = null;
+  customers: Customer[] = [];
 
   constructor(
     private accountService: AccountService,
+    private customerService: CustomerService,
     private transactionService: TransactionService,
     private notificationService: NotificationService,
     private dialog: MatDialog,
@@ -43,6 +50,7 @@ export class AccountsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAccounts();
+    this.loadCustomers();
   }
 
   private loadAccounts(): void {
@@ -58,6 +66,17 @@ export class AccountsComponent implements OnInit {
         if (error.status === 401) {
           this.router.navigate(['/login']);
         }
+      }
+    });
+  }
+
+  private loadCustomers(): void {
+    this.customerService.getCustomers().subscribe({
+      next: (customers) => {
+        this.customers = customers;
+      },
+      error: (error) => {
+        this.notificationService.showError('Erreur lors du chargement des clients');
       }
     });
   }
@@ -150,14 +169,10 @@ export class AccountsComponent implements OnInit {
         });
         break;
     }
-  }
-  private handleTransactionResponse(response: any): void {
-    if (response) {
-      this.notificationService.showSuccess('Transaction completed successfully');
-      this.loadAccounts(); // Reload accounts to show updated balances
-    } else {
-      this.notificationService.showError('Transaction failed. Please try again.');
-    }
+  }  private handleTransactionResponse(response: any): void {
+    // The response will always be truthy now due to our changes in the transaction service
+    this.notificationService.showSuccess('Transaction completed successfully');
+    this.loadAccounts(); // Reload accounts to show updated balances
   }
 
   getAccountTypeSpecificValue(account: BaseAccount): string {
@@ -170,5 +185,34 @@ export class AccountsComponent implements OnInit {
 
   getAccountTypeSpecificLabel(account: BaseAccount): string {
     return account.type === 'CurrentAccount' ? 'Découvert autorisé' : 'Taux d\'intérêt';
+  }
+
+  openNewAccountDialog(): void {
+    const dialogRef = this.dialog.open(AccountDialogComponent, {
+      width: '500px',
+      data: { 
+        customers: this.customers
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((accountRequest: AccountRequest) => {
+      if (accountRequest) {
+        this.createAccount(accountRequest);
+      }
+    });
+  }
+
+  private createAccount(accountRequest: AccountRequest): void {
+    this.loading = true;
+    this.accountService.createAccount(accountRequest).subscribe({
+      next: (account) => {
+        this.notificationService.showSuccess('Le compte a été créé avec succès');
+        this.loadAccounts();
+      },
+      error: (error) => {
+        this.loading = false;
+        this.notificationService.showError(error.error.message || 'Erreur lors de la création du compte');
+      }
+    });
   }
 }

@@ -13,3 +13,8 @@ export interface User {
     username: string;
     roles?: string[];
 }
+
+export interface PasswordChangeRequest {
+    oldPassword: string;
+    newPassword: string;
+}

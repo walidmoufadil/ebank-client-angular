@@ -5,7 +5,6 @@
   <div *ngIf="loading" class="flex justify-center items-center h-64">
     <mat-spinner></mat-spinner>
   </div>
-
   <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <!-- Carte statistique - Total des comptes -->
     <mat-card class="bg-indigo-50">
@@ -23,10 +22,47 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Autres statistiques peuvent être ajoutées ici -->
+    <!-- Carte statistique - Total des crédits -->
+    <mat-card class="bg-green-50">
+      <mat-card-content class="p-4">
+        <div class="text-green-600 text-lg font-semibold">Total des crédits</div>
+        <div class="text-3xl font-bold mt-2">{{ formatCurrency(totalCredit) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Carte statistique - Total des débits -->
+    <mat-card class="bg-red-50">
+      <mat-card-content class="p-4">
+        <div class="text-red-600 text-lg font-semibold">Total des débits</div>
+        <div class="text-3xl font-bold mt-2">{{ formatCurrency(totalDebit) }}</div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- Flux net (positif ou négatif) -->
+  <div *ngIf="!loading && !dataAnalysisLoading" class="mb-6">
+    <mat-card [ngClass]="netFlow >= 0 ? 'bg-green-50' : 'bg-red-50'">
+      <mat-card-content class="p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div [ngClass]="netFlow >= 0 ? 'text-green-600' : 'text-red-600'" class="text-lg font-semibold">
+              {{ netFlow >= 0 ? 'Flux net positif' : 'Flux net négatif' }}
+            </div>
+            <div class="text-3xl font-bold mt-2" [ngClass]="netFlow >= 0 ? 'text-green-700' : 'text-red-700'">
+              {{ formatCurrency(netFlow) }}
+            </div>
+          </div>
+          <div [ngClass]="netFlow >= 0 ? 'text-green-500' : 'text-red-500'" class="text-5xl">
+            {{ netFlow >= 0 ? '↑' : '↓' }}
+          </div>
+        </div>
+        <p class="mt-3 text-sm text-gray-600">
+          {{ netFlow >= 0 ? 'Les crédits dépassent les débits, ce qui indique un flux de trésorerie positif.' : 'Les débits dépassent les crédits, ce qui indique un flux de trésorerie négatif.' }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <!-- Graphique en donut des types de comptes -->
     <mat-card>
       <mat-card-header>
@@ -52,6 +88,79 @@
           [data]="balanceChartData"
           [options]="balanceChartOptions">
         </canvas>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Analyse intelligente des opérations -->
+  <div class="mb-6">
+    <mat-card class="bg-white">
+      <mat-card-header>
+        <mat-card-title class="flex items-center">
+          <span>Analyse intelligente des opérations</span>
+          <div *ngIf="dataAnalysisLoading" class="ml-4">
+            <mat-spinner [diameter]="24"></mat-spinner>
+          </div>
+        </mat-card-title>
+        <mat-card-subtitle>Graphique d'aide à la décision basé sur l'historique des opérations</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <div *ngIf="dataAnalysisLoading" class="flex justify-center items-center h-64">
+          <mat-spinner></mat-spinner>
+        </div>
+        
+        <div *ngIf="!dataAnalysisLoading">
+          <div class="h-80">
+            <canvas baseChart
+              [type]="'line'"
+              [data]="operationsAnalysisChartData"
+              [options]="operationsAnalysisChartOptions">
+            </canvas>
+          </div>
+
+          <!-- Insights générés automatiquement -->
+          <div class="mt-6 bg-blue-50 p-4 rounded-md">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">Insights et recommandations</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Tendance du flux -->
+              <div class="bg-white p-3 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800">Tendance du flux</h4>
+                <p class="text-sm text-gray-600 mt-1" *ngIf="netFlow >= 0">
+                  Flux de trésorerie positif. Les dépôts dépassent les retraits.
+                </p>
+                <p class="text-sm text-gray-600 mt-1" *ngIf="netFlow < 0">
+                  Attention : Flux de trésorerie négatif. Les retraits dépassent les dépôts.
+                </p>
+              </div>
+              
+              <!-- Équilibre des opérations -->
+              <div class="bg-white p-3 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800">Équilibre des opérations</h4>
+                <p class="text-sm text-gray-600 mt-1" *ngIf="totalCredit > 0 && totalDebit > 0">
+                  Ratio crédit/débit: {{ (totalCredit / totalDebit).toFixed(2) }}
+                  <span *ngIf="totalCredit / totalDebit > 1.2">(Excellent)</span>
+                  <span *ngIf="totalCredit / totalDebit <= 1.2 && totalCredit / totalDebit >= 0.8">(Équilibré)</span>
+                  <span *ngIf="totalCredit / totalDebit < 0.8">(Attention)</span>
+                </p>
+                <p class="text-sm text-gray-600 mt-1" *ngIf="totalCredit === 0 || totalDebit === 0">
+                  Données insuffisantes pour calculer le ratio.
+                </p>
+              </div>
+              
+              <!-- Recommandation -->
+              <div class="bg-white p-3 rounded shadow-sm col-span-full">
+                <h4 class="font-medium text-gray-800">Recommandation</h4>
+                <p class="text-sm text-gray-600 mt-1" *ngIf="netFlow >= 0">
+                  Les comptes sont en bonne santé financière. Vous pourriez envisager d'investir l'excédent dans des comptes à terme ou d'épargne pour maximiser les intérêts.
+                </p>
+                <p class="text-sm text-gray-600 mt-1" *ngIf="netFlow < 0">
+                  Il est recommandé de surveiller les dépenses et d'encourager les dépôts pour rétablir un flux de trésorerie positif.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </mat-card-content>
     </mat-card>
   </div>

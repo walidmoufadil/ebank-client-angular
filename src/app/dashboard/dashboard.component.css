@@ -8,8 +8,28 @@
 
 mat-card {
   @apply mb-4;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+mat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 mat-card-header {
   @apply pb-4;
+}
+
+.h-80 {
+  height: 20rem;
+}
+
+/* Animation pour les statistiques */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.text-3xl {
+  animation: fadeIn 0.8s ease-out;
 }

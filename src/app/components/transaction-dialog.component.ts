@@ -36,8 +36,7 @@ interface TransactionResult {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-  ],
-  template: `
+  ],  template: `
     <div class="p-6">
       <h2 class="text-2xl font-bold mb-4">
         {{ getTitle() }}
@@ -45,28 +44,40 @@ interface TransactionResult {
       
       <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()" class="space-y-4">
         <div *ngIf="data.type === 'TRANSFER'" class="form-field">
-          <mat-form-field class="w-full">
-            <mat-label>Destination Account</mat-label>
+          <mat-form-field *ngIf="data.accounts" class="w-full">
+            <mat-label>Compte Destinataire</mat-label>
             <mat-select formControlName="destinationAccountId">
               <mat-option *ngFor="let account of data.accounts" [value]="account.id">
-                {{ account.id }} (Balance: {{ account.balance | currency }})
+                {{ account.id }} (Solde: {{ account.balance | currency }})
               </mat-option>
             </mat-select>
             <mat-error *ngIf="transactionForm.get('destinationAccountId')?.hasError('required')">
-              Destination account is required
+              Le compte destinataire est requis
+            </mat-error>
+          </mat-form-field>
+          
+          <!-- Pour les transfers quand aucun compte n'est fourni (clients) -->
+          <mat-form-field *ngIf="!data.accounts" class="w-full">
+            <mat-label>ID du Compte Destinataire</mat-label>
+            <input matInput formControlName="destinationAccountId" placeholder="ex: a1b2c3d4-e5f6-...">
+            <mat-error *ngIf="transactionForm.get('destinationAccountId')?.hasError('required')">
+              L'ID du compte destinataire est requis
+            </mat-error>
+            <mat-error *ngIf="transactionForm.get('destinationAccountId')?.hasError('pattern')">
+              Format d'ID invalide
             </mat-error>
           </mat-form-field>
         </div>
 
         <div class="form-field">
           <mat-form-field class="w-full">
-            <mat-label>Amount</mat-label>
+            <mat-label>Montant</mat-label>
             <input matInput type="number" formControlName="amount" min="0" step="0.01">
             <mat-error *ngIf="transactionForm.get('amount')?.hasError('required')">
-              Amount is required
+              Le montant est requis
             </mat-error>
             <mat-error *ngIf="transactionForm.get('amount')?.hasError('min')">
-              Amount must be greater than 0
+              Le montant doit être supérieur à 0
             </mat-error>
           </mat-form-field>
         </div>

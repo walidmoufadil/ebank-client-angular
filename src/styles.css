@@ -1,6 +1,23 @@
 /* Angular Material Theme */
 @import "@angular/material/prebuilt-themes/indigo-pink.css";
+/* Import des icônes Material */
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Styles globaux pour les icônes Material */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}

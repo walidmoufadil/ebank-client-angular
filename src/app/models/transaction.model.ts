@@ -9,6 +9,7 @@ export interface Transaction {
     destinationAccountId?: string;
     timestamp?: string;
     status?: 'PENDING' | 'COMPLETED' | 'FAILED';
+    userId?: string | null;
 }
 
 export interface TransactionHistory {
@@ -16,4 +17,5 @@ export interface TransactionHistory {
     totalPages: number;
     currentPage: number;
     pageSize: number;
+    totalItems: number;
 }
